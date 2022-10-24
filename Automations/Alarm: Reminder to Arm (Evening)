@@ -1,0 +1,36 @@
+alias: "Alarm: Reminder to Arm (Evening)"
+description: Reminder to arm the alarm if the the alarm is not armed
+trigger:
+  - platform: time
+    at: "23:00:00"
+condition:
+  - condition: state
+    entity_id: group.home_occupancy
+    state: "on"
+  - condition: or
+    conditions:
+      - condition: state
+        entity_id: alarm_control_panel.indoor
+        state: disarmed
+      - condition: state
+        entity_id: alarm_control_panel.outdoor
+        state: disarmed
+action:
+  - service: media_player.play_media
+    target:
+      entity_id: media_player.downstairs
+    data:
+      media_content_id: media-source://tts/google_translate?message=Alarm+is+not+armed
+      media_content_type: provider
+    metadata:
+      title: Alarm is not armed
+      thumbnail: https://brands.home-assistant.io/_/google_translate/logo.png
+      media_class: app
+      children_media_class: null
+      navigateIds:
+        - {}
+        - media_content_type: app
+          media_content_id: media-source://tts
+        - media_content_type: provider
+          media_content_id: media-source://tts/google_translate?message=Alarm+is+not+armed
+mode: single
