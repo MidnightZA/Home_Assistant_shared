@@ -1,0 +1,90 @@
+alias: "Alarm: Telegram Arm/Disarm"
+description: |-
+  Arm and Disarm the Alarm using Telegram Text:
+
+  Arm away:
+
+  Disarm all:
+
+  Disarm Interior:
+
+  Disarm Exterior:
+trigger:
+  - platform: event
+    event_type: telegram_text
+    event_data:
+      text: Arm away
+    id: Arm-away
+  - platform: event
+    event_type: telegram_text
+    event_data:
+      text: Disarm all
+    id: Disarm-all
+  - platform: event
+    event_type: telegram_text
+    event_data:
+      text: Disarm interior
+    id: Disarm-interior
+  - platform: event
+    event_type: telegram_text
+    event_data:
+      text: Disarm exterior
+    id: Disarm-exterior
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: Arm-away
+        sequence:
+          - service: alarm_control_panel.alarm_arm_away
+            target:
+              entity_id:
+                - alarm_control_panel.outdoor
+            data: {}
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 0
+              milliseconds: 200
+          - service: alarm_control_panel.alarm_arm_away
+            target:
+              entity_id: alarm_control_panel.indoor
+            data: {}
+      - conditions:
+          - condition: trigger
+            id: Disarm-all
+        sequence:
+          - service: alarm_control_panel.alarm_disarm
+            target:
+              entity_id:
+                - alarm_control_panel.outdoor
+            data: {}
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 0
+              milliseconds: 200
+          - service: alarm_control_panel.alarm_disarm
+            target:
+              entity_id: alarm_control_panel.indoor
+            data: {}
+      - conditions:
+          - condition: trigger
+            id: Disarm-interior
+        sequence:
+          - service: alarm_control_panel.alarm_disarm
+            target:
+              entity_id: alarm_control_panel.indoor
+            data: {}
+      - conditions:
+          - condition: trigger
+            id: Disarm-exterior
+        sequence:
+          - service: alarm_control_panel.alarm_disarm
+            target:
+              entity_id:
+                - alarm_control_panel.outdoor
+            data: {}
+    default: []
+mode: single
