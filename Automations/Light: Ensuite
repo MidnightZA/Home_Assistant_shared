@@ -1,0 +1,18 @@
+alias: "Light: Ensuite "
+description: Turns off the Ensuite Light after 30 min
+trigger:
+  - platform: state
+    entity_id:
+      - switch.master_bedroom_ensuite
+    to: "on"
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+condition: []
+action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.master_bedroom_ensuite
+mode: single
