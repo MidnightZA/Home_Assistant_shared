@@ -1,0 +1,57 @@
+alias: "Geyser: Toggle On/Off"
+description: |-
+  Turn on the Geyser: 
+  At 4PM when we are in Richards Bay
+
+  Turn off the Geyser:
+  After 5:30PM if not drawing power for 5min
+trigger:
+  - platform: time
+    at: "16:00:00"
+    id: geyser-on
+  - platform: numeric_state
+    entity_id: sensor.geyser_power
+    id: geyser-off
+    below: "100"
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: geyser-on
+          - condition: or
+            conditions:
+              - condition: zone
+                entity_id: device_tracker.nadir_s22
+                zone: zone.richards_bay
+              - condition: zone
+                entity_id: device_tracker.laurika
+                zone: zone.richards_bay
+        sequence:
+          - type: turn_on
+            device_id: d6db8b1862d72c768b87dea9b36d896c
+            entity_id: switch.geyser_switch
+            domain: switch
+      - conditions:
+          - condition: trigger
+            id: geyser-off
+          - condition: time
+            after: "17:30:00"
+            weekday:
+              - mon
+              - tue
+              - wed
+              - thu
+              - fri
+              - sat
+              - sun
+        sequence:
+          - type: turn_off
+            device_id: d6db8b1862d72c768b87dea9b36d896c
+            entity_id: switch.geyser_switch
+            domain: switch
+mode: single
