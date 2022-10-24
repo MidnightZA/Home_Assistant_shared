@@ -1,0 +1,32 @@
+alias: "HASS: Telegram Startup and Shutdown"
+description: |-
+  System notification for when Home Assistant:
+
+  Starts Up:
+  Shuts down:
+trigger:
+  - platform: homeassistant
+    event: start
+    id: hass-start
+  - platform: homeassistant
+    event: shutdown
+    id: hass-shutdown
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: hass-start
+        sequence:
+          - service: notify.nadirhass_bot
+            data:
+              message: Home Assistant Started
+      - conditions:
+          - condition: trigger
+            id: hass-shutdown
+        sequence:
+          - service: notify.nadirhass_bot
+            data:
+              message: Home Assistant Shutdown
+    default: []
+mode: single
