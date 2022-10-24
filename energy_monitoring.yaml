@@ -1,0 +1,19 @@
+sensor:
+  # Sensor for Riemann sum of energy bought (W -> Wh)
+  - platform: integration
+    source: sensor.geyser_power
+    name: geyser_usage
+    unit_prefix: k
+    round: 2
+    method: left
+
+utility_meter:
+  geyser_daily:
+    source: sensor.geyser_usage
+    cycle: daily
+  geyser_monthly:
+    source: sensor.geyser_usage
+    cycle: monthly
+  geyser_weekly:
+    source: sensor.geyser_usage
+    cycle: weekly
