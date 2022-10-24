@@ -1,0 +1,22 @@
+alias: "Light: Turn All Off"
+description: Turns off all lights when we leave home
+trigger:
+  - platform: state
+    entity_id:
+      - group.home_occupancy
+    from: "on"
+    to: "off"
+condition: []
+action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id:
+        - switch.all_lights
+      area_id:
+        - backyard
+        - dining_room
+        - kitchen
+        - lounge
+        - master_bedroom
+mode: single
