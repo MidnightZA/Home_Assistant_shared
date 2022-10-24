@@ -1,0 +1,15 @@
+alias: "NFC: Disarm"
+description: ""
+trigger:
+  - platform: event
+    event_type: tag_scanned
+    event_data:
+      device_id: be55d4ea58d27cab
+      tag_id: a5151b2c-e538-4fb5-abf8-8c08ab92dca2
+condition: []
+action:
+  - service: alarm_control_panel.alarm_disarm
+    data: {}
+    target:
+      entity_id: alarm_control_panel.indoor
+mode: single
