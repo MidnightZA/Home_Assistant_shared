@@ -1,0 +1,17 @@
+alias: "Master Bedroom: Speaker - Stop Playback"
+description: Stops the master bedroom speaker after 1 hour
+trigger:
+  - platform: state
+    entity_id: media_player.master_bedroom_speaker
+    to: playing
+    for:
+      hours: 0
+      minutes: 45
+      seconds: 0
+condition: []
+action:
+  - service: media_player.media_stop
+    target:
+      device_id: b3e9d29288e1a825194b42f3afec7d10
+    data: {}
+mode: single
