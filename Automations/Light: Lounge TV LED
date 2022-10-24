@@ -1,0 +1,64 @@
+alias: "Light: Lounge TV LED On/Off"
+description: |-
+  Toggle for Lounge TV LED Lights:
+  On
+  Off
+trigger:
+  - platform: device
+    type: turned_on
+    device_id: ce1dff221e1ad16c2ac07c53a41ad08e
+    entity_id: switch.samsung_7_series_55
+    domain: switch
+    id: tv-on
+  - platform: device
+    type: turned_off
+    device_id: ce1dff221e1ad16c2ac07c53a41ad08e
+    entity_id: switch.samsung_7_series_55
+    domain: switch
+    id: tv-off
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: tv-on
+        sequence:
+          - device_id: 84062b0f2b61c162a78be8e518bffaad
+            domain: select
+            entity_id: select.lounge_tv_preset
+            type: select_option
+            option: Blue Swipe
+          - type: turn_on
+            device_id: 84062b0f2b61c162a78be8e518bffaad
+            entity_id: light.lounge_tv
+            domain: light
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 5
+              milliseconds: 300
+          - device_id: 84062b0f2b61c162a78be8e518bffaad
+            domain: select
+            entity_id: select.lounge_tv_preset
+            type: select_option
+            option: Blue Solid
+      - conditions:
+          - condition: trigger
+            id: tv-off
+        sequence:
+          - device_id: 84062b0f2b61c162a78be8e518bffaad
+            domain: select
+            entity_id: select.lounge_tv_preset
+            type: select_option
+            option: Lighthouse Blue
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 4
+              milliseconds: 0
+          - type: turn_off
+            device_id: 84062b0f2b61c162a78be8e518bffaad
+            entity_id: light.lounge_tv
+            domain: light
+    default: []
+mode: single
