@@ -1,0 +1,41 @@
+Home Occupancy:
+    name: "Home Occupancy"
+    entities:
+    - person.nadir
+    - person.laurika
+    - switch.guest
+
+door_zones:
+    name: Door Zones
+    entities:
+    - binary_sensor.front_door
+    - binary_sensor.lounge_door
+    - binary_sensor.room_door
+    - binary_sensor.kitchen_door
+
+interior_passives:
+    name: Interior Passives
+    entities:
+    - binary_sensor.dining_room
+    - binary_sensor.lounge_pir
+    - binary_sensor.upstairs_pir
+    
+exterior_zones:
+    name: Exterior Alarm Zones
+    entities:
+    - binary_sensor.garage_pir
+    - binary_sensor.lounge_beam
+    - binary_sensor.back_beam
+
+staircase_motion:
+    name: Staircase Motion Sensors
+    entities:
+        - binary_sensor.stairs_motion_sensor_bottom_ias_zone
+        - binary_sensor.stairs_motion_sensor_top_ias_zone
+
+power_outage:
+    name:  Power Outage Sensors
+    entities:
+        - switch.sonoff_1000d939b5
+        - media_player.master_bedroom_speaker
+        - media_player.dining_room_speaker

@@ -1,0 +1,1486 @@
+- id: '1624870886658'
+  alias: 'Wireless Button: Master Bedroom'
+  description: 'Single Press: Toggle Bedroom Light
+
+    Double Press: Interior Arm Stay , Exterior Arm Away
+
+    Long Press: NIL
+
+    '
+  use_blueprint:
+    path: garykrige/zha-sonoff-zigbee-switch.yaml
+    input:
+      toggle_action:
+      - service: switch.toggle
+        data: {}
+        target:
+          entity_id: switch.desk_light
+      off_action:
+      - service: switch.toggle
+        data: {}
+        target:
+          entity_id:
+          - switch.master_bedroom_ensuite
+          - switch.desk_light
+      on_action:
+      - service: alarm_control_panel.alarm_arm_home
+        data: {}
+        target:
+          entity_id: alarm_control_panel.indoor
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 0
+          milliseconds: 500
+      - service: alarm_control_panel.alarm_arm_away
+        target:
+          entity_id: alarm_control_panel.outdoor
+        data: {}
+      sonoff_button: c40646fb16e6a7270c8a473f8c9a8ba9
+- id: '1634289375625'
+  alias: 'Geyser: Toggle On/Off'
+  description: "Turn on the Geyser: \nAt 4PM when we are in Richards Bay\n\nTurn off
+    the Geyser:\nAfter 5:30PM if not drawing power for 5min"
+  trigger:
+  - platform: time
+    at: '16:00:00'
+    id: geyser-on
+  - platform: numeric_state
+    entity_id: sensor.geyser_power
+    id: geyser-off
+    below: '100'
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: geyser-on
+      - condition: or
+        conditions:
+        - condition: zone
+          entity_id: device_tracker.nadir_s22
+          zone: zone.richards_bay
+        - condition: zone
+          entity_id: device_tracker.laurika
+          zone: zone.richards_bay
+      sequence:
+      - type: turn_on
+        device_id: d6db8b1862d72c768b87dea9b36d896c
+        entity_id: switch.geyser_switch
+        domain: switch
+    - conditions:
+      - condition: trigger
+        id: geyser-off
+      - condition: time
+        after: '17:30:00'
+        weekday:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+        - sat
+        - sun
+      sequence:
+      - type: turn_off
+        device_id: d6db8b1862d72c768b87dea9b36d896c
+        entity_id: switch.geyser_switch
+        domain: switch
+  mode: single
+- id: '1634765159486'
+  alias: 'Master Bedroom: Speaker - Stop Playback'
+  description: Stops the master bedroom speaker after 1 hour
+  trigger:
+  - platform: state
+    entity_id: media_player.master_bedroom_speaker
+    to: playing
+    for:
+      hours: 0
+      minutes: 45
+      seconds: 0
+  condition: []
+  action:
+  - service: media_player.media_stop
+    target:
+      device_id: b3e9d29288e1a825194b42f3afec7d10
+    data: {}
+  mode: single
+- id: '1636375527913'
+  alias: 'Light: Default State Override'
+  description: Turns off lights that default to on
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.geyser_switch
+    from: unavailable
+    to: 'off'
+    enabled: false
+  - platform: homeassistant
+    event: start
+  condition: []
+  action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id:
+      - switch.lounge_led
+      - switch.dining_room_led
+      - switch.master_bedroom_led
+      - switch.kitchen_led
+  - type: turn_off
+    device_id: e9662cbf347a6fbd4ce81ef0c9de6a4b
+    entity_id: light.staircase_light
+    domain: light
+  mode: single
+- id: '1645526711887'
+  alias: 'Alarm: Notification - Exterior '
+  description: 'Sends Telegram message for Exterior Alarm State:
+
+
+    Armed:
+
+
+    Disarmed:
+
+
+    Triggered:'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.outdoor
+    id: armed
+    from: disarmed
+  - platform: state
+    entity_id: alarm_control_panel.outdoor
+    to: disarmed
+    id: disarmed
+  - platform: state
+    entity_id: alarm_control_panel.outdoor
+    id: triggered
+    to: triggered
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: armed
+      sequence:
+      - service: notify.nadirhass_bot
+        data:
+          message: Armed
+          title: Exterior Alarm
+    - conditions:
+      - condition: trigger
+        id: disarmed
+      sequence:
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 0
+          milliseconds: 100
+      - service: notify.nadirhass_bot
+        data:
+          message: Disarmed
+          title: Exterior Alarm
+    - conditions:
+      - condition: trigger
+        id: triggered
+      sequence:
+      - service: notify.nadirhass_bot
+        data:
+          message: '{% for sensor in states.binary_sensor %}{%if state_attr(sensor.entity_id,''device_class'')
+            == ''motion'' %}{%if states(sensor.entity_id) == ''on''%}The {{state_attr(sensor.entity_id,''friendly_name'')}}
+            detected motion{%endif%}{%endif%}{%endfor%}'
+          title: '***Exterior Alarm Triggered***'
+    default: []
+  mode: single
+- id: '1645538362654'
+  alias: 'Alarm: Notification - Interior'
+  description: 'Sends Telegram message for Interior Alarm State:
+
+
+    Armed:
+
+
+    Disarmed:
+
+
+    Triggered:'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.indoor
+    id: armed
+    from: disarmed
+  - platform: state
+    entity_id: alarm_control_panel.indoor
+    to: disarmed
+    id: disarmed
+  - platform: state
+    entity_id: alarm_control_panel.indoor
+    id: triggered
+    to: triggered
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: armed
+      sequence:
+      - service: notify.nadirhass_bot
+        data:
+          message: Armed
+          title: Interior Alarm
+    - conditions:
+      - condition: trigger
+        id: disarmed
+      sequence:
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 0
+          milliseconds: 100
+      - service: notify.nadirhass_bot
+        data:
+          message: Disarmed
+          title: Interior Alarm
+    - conditions:
+      - condition: trigger
+        id: triggered
+      sequence:
+      - service: notify.nadirhass_bot
+        data:
+          message: '{% for sensor in states.binary_sensor %}{%if state_attr(sensor.entity_id,''device_class'')
+            == ''motion'' %}{%if states(sensor.entity_id) == ''on''%}The {{state_attr(sensor.entity_id,''friendly_name'')}}
+            detected motion{{''
+
+            ''}}{%endif%}{%elif state_attr(sensor.entity_id,''device_class'') == ''door''
+            or state_attr(sensor.entity_id,''device_class'') == ''window''%}{%if states(sensor.entity_id)
+            == ''on''%}The {{state_attr(sensor.entity_id,''friendly_name'')}} was
+            opened{{''
+
+            ''}}{%endif%}{%elif state_attr(sensor.entity_id,''friendly_name'') ==
+            ''Panic Button''%}{%if states(sensor.entity_id) == ''on''%}The {{state_attr(sensor.entity_id,''friendly_name'')}}
+            was pressed}}{%endif%}{%endif%}{%endfor%}'
+          title: '***Interior Alarm Triggered***'
+    default: []
+  mode: single
+- id: '1645538907702'
+  alias: 'Light: Staircase Toggle On/Off'
+  description: 'Automation for staircase light:
+
+    1: Going Up Stairs - Turn On:  Turns on when walking up the stairs, only triggers
+    when someone is at home (Disarmed - Cyan)
+
+    2: Going Up Stairs - Turn Off: Turns off 7 seconds after reaching the top
+
+    3: Going Down Stairs - Turn On: Turns on when walking down the stairs, only triggers
+    when someone is at home
+
+    4: Going Down Stairs - Turn Off: Turns off 7 seconds after reaching the bottom
+
+    5: Turn Off: Turns off after 1 minute, this is incase either action is triggered
+    but don''t walk to the other end to trigger the turn off
+
+    6: Going Up Stairs - Turn On:  Turns on when walking up the stairs, only triggers
+    when someone is at home (Armed- Red)'
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.stairs_motion_sensor_bottom_ias_zone
+    to: 'on'
+    id: lower-sensor
+  - platform: state
+    entity_id:
+    - binary_sensor.stairs_motion_sensor_top_ias_zone
+    id: upper-sensor
+    to: 'on'
+  - platform: state
+    entity_id: group.staircase_motion
+    from: 'on'
+    to: 'off'
+    id: global-off
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: lower-sensor
+      - condition: state
+        state: 'off'
+        entity_id: light.staircase_light
+      - condition: state
+        entity_id: group.home_occupancy
+        state: 'on'
+      - condition: device
+        device_id: 1672dc1d3c3cf8f97fb60ea3feb2e12f
+        domain: alarm_control_panel
+        entity_id: alarm_control_panel.indoor
+        type: is_disarmed
+      sequence:
+      - service: light.turn_on
+        data:
+          color_name: cyan
+        target:
+          entity_id: light.staircase_light
+      - service: light.turn_on
+        target:
+          entity_id:
+          - light.staircase_light
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: upper-sensor
+      - condition: state
+        entity_id: light.staircase_light
+        state: 'on'
+      sequence:
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 7
+          milliseconds: 0
+      - service: light.turn_off
+        target:
+          entity_id:
+          - light.staircase_light
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: upper-sensor
+      - condition: state
+        entity_id: light.staircase_light
+        state: 'off'
+      - condition: state
+        entity_id: group.home_occupancy
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.stairs_motion_sensor_bottom_ias_zone
+        state: 'off'
+      sequence:
+      - service: light.turn_on
+        target:
+          entity_id:
+          - light.staircase_light
+        data:
+          color_name: darkgreen
+      - service: light.turn_on
+        data: {}
+        target:
+          entity_id:
+          - light.staircase_light
+    - conditions:
+      - condition: trigger
+        id: lower-sensor
+      - condition: state
+        state: 'on'
+        entity_id: light.staircase_light
+      sequence:
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 7
+          milliseconds: 0
+      - service: light.turn_off
+        target:
+          entity_id:
+          - light.staircase_light
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: global-off
+      - condition: state
+        entity_id: light.staircase_light
+        state: 'on'
+      sequence:
+      - service: light.turn_off
+        target:
+          entity_id:
+          - light.staircase_light
+        data:
+          transition: 10
+    - conditions:
+      - condition: trigger
+        id: lower-sensor
+      - condition: state
+        state: 'off'
+        entity_id: light.staircase_light
+      - condition: state
+        entity_id: group.home_occupancy
+        state: 'on'
+      - condition: device
+        device_id: 1672dc1d3c3cf8f97fb60ea3feb2e12f
+        domain: alarm_control_panel
+        entity_id: alarm_control_panel.indoor
+        type: is_armed_home
+      sequence:
+      - service: light.turn_on
+        data:
+          color_name: red
+        target:
+          entity_id:
+          - light.staircase_light
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 10
+          milliseconds: 0
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id:
+          - light.staircase_light
+    default: []
+  mode: single
+- id: '1645541289333'
+  alias: 'Alarm: Telegram Arm/Disarm'
+  description: 'Arm and Disarm the Alarm using Telegram Text:
+
+
+    Arm away:
+
+
+    Disarm all:
+
+
+    Disarm Interior:
+
+
+    Disarm Exterior:'
+  trigger:
+  - platform: event
+    event_type: telegram_text
+    event_data:
+      text: Arm away
+    id: Arm-away
+  - platform: event
+    event_type: telegram_text
+    event_data:
+      text: Disarm all
+    id: Disarm-all
+  - platform: event
+    event_type: telegram_text
+    event_data:
+      text: Disarm interior
+    id: Disarm-interior
+  - platform: event
+    event_type: telegram_text
+    event_data:
+      text: Disarm exterior
+    id: Disarm-exterior
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: Arm-away
+      sequence:
+      - service: alarm_control_panel.alarm_arm_away
+        target:
+          entity_id:
+          - alarm_control_panel.outdoor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 0
+          milliseconds: 200
+      - service: alarm_control_panel.alarm_arm_away
+        target:
+          entity_id: alarm_control_panel.indoor
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: Disarm-all
+      sequence:
+      - service: alarm_control_panel.alarm_disarm
+        target:
+          entity_id:
+          - alarm_control_panel.outdoor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 0
+          milliseconds: 200
+      - service: alarm_control_panel.alarm_disarm
+        target:
+          entity_id: alarm_control_panel.indoor
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: Disarm-interior
+      sequence:
+      - service: alarm_control_panel.alarm_disarm
+        target:
+          entity_id: alarm_control_panel.indoor
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: Disarm-exterior
+      sequence:
+      - service: alarm_control_panel.alarm_disarm
+        target:
+          entity_id:
+          - alarm_control_panel.outdoor
+        data: {}
+    default: []
+  mode: single
+- id: '1645541481754'
+  alias: 'HASS: Telegram Startup and Shutdown'
+  description: 'System notification for when Home Assistant:
+
+
+    Starts Up:
+
+    Shuts down:'
+  trigger:
+  - platform: homeassistant
+    event: start
+    id: hass-start
+  - platform: homeassistant
+    event: shutdown
+    id: hass-shutdown
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: hass-start
+      sequence:
+      - service: notify.nadirhass_bot
+        data:
+          message: Home Assistant Started
+    - conditions:
+      - condition: trigger
+        id: hass-shutdown
+      sequence:
+      - service: notify.nadirhass_bot
+        data:
+          message: Home Assistant Shutdown
+    default: []
+  mode: single
+- id: '1645790004558'
+  alias: 'Alarm: Auto Arm/Disarm'
+  description: 'Control for Alarm System:
+
+    Auto Arm Away:  When Home occupancy is "OFF" for 60 seconds
+
+    Auto Arm Stay: Activates beams when we are home
+
+    Auto Disarm: When Nadir comes home from work
+
+    Auto Disarm Beams: Deactivates the alarm when Dining PIR or Lounge PIR detects
+    motion before opening the Main Entrance Door.'
+  trigger:
+  - platform: state
+    entity_id: group.home_occupancy
+    from: 'on'
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    id: occupancy_off
+  - platform: state
+    entity_id: person.nadir
+    from: home
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+    id: nadir-away
+  - platform: state
+    entity_id:
+    - group.door_zones
+    id: doors-closed-1hr
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  - platform: state
+    entity_id: person.nadir
+    to: home
+    id: nadir-home
+  - platform: state
+    entity_id: binary_sensor.front_door
+    to: 'on'
+    id: front-door
+  - platform: state
+    entity_id: group.interior_passives
+    to: 'off'
+    for:
+      hours: 1
+      minutes: 0
+      seconds: 0
+    id: no-motion
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: occupancy_off
+      sequence:
+      - service: script.arm_away
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: nadir-away
+      - condition: state
+        entity_id: person.laurika
+        state: home
+      sequence:
+      - service: switch.toggle
+        data: {}
+        target:
+          entity_id: switch.lounge_pir
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 1
+          milliseconds: 0
+      - service: script.arm_home
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: doors-closed-1hr
+      - condition: state
+        entity_id: group.home_occupancy
+        state: 'on'
+      - condition: time
+        after: '17:00:00'
+        weekday:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+        - sat
+        - sun
+      sequence:
+      - service: alarm_control_panel.alarm_arm_away
+        data: {}
+        target:
+          entity_id: alarm_control_panel.outdoor
+    - conditions:
+      - condition: trigger
+        id: nadir-home
+      - condition: state
+        entity_id: person.laurika
+        state: home
+      sequence:
+      - service: script.disarm_all
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: front-door
+      - condition: state
+        entity_id: group.home_occupancy
+        state: 'on'
+      sequence:
+      - service: alarm_control_panel.alarm_disarm
+        data: {}
+        target:
+          entity_id: alarm_control_panel.outdoor
+    - conditions:
+      - condition: trigger
+        id: no-motion
+      - condition: time
+        before: '23:59:59'
+        after: '22:00:00'
+        weekday:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+        - sat
+        - sun
+      - condition: state
+        entity_id: group.home_occupancy
+        state: 'on'
+      - condition: state
+        entity_id: alarm_control_panel.indoor
+        state: disarmed
+      sequence:
+      - service: script.arm_home
+        data: {}
+    default: []
+  mode: single
+- id: '1646417032736'
+  alias: 'Light: Lounge TV LED On/Off'
+  description: 'Toggle for Lounge TV LED Lights:
+
+    On
+
+    Off'
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: ce1dff221e1ad16c2ac07c53a41ad08e
+    entity_id: switch.samsung_7_series_55
+    domain: switch
+    id: tv-on
+  - platform: device
+    type: turned_off
+    device_id: ce1dff221e1ad16c2ac07c53a41ad08e
+    entity_id: switch.samsung_7_series_55
+    domain: switch
+    id: tv-off
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: tv-on
+      sequence:
+      - device_id: 84062b0f2b61c162a78be8e518bffaad
+        domain: select
+        entity_id: select.lounge_tv_preset
+        type: select_option
+        option: Blue Swipe
+      - type: turn_on
+        device_id: 84062b0f2b61c162a78be8e518bffaad
+        entity_id: light.lounge_tv
+        domain: light
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 5
+          milliseconds: 300
+      - device_id: 84062b0f2b61c162a78be8e518bffaad
+        domain: select
+        entity_id: select.lounge_tv_preset
+        type: select_option
+        option: Blue Solid
+    - conditions:
+      - condition: trigger
+        id: tv-off
+      sequence:
+      - device_id: 84062b0f2b61c162a78be8e518bffaad
+        domain: select
+        entity_id: select.lounge_tv_preset
+        type: select_option
+        option: Lighthouse Blue
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 4
+          milliseconds: 0
+      - type: turn_off
+        device_id: 84062b0f2b61c162a78be8e518bffaad
+        entity_id: light.lounge_tv
+        domain: light
+    default: []
+  mode: single
+- id: '1650269557334'
+  alias: 'Wireless Button: Lounge'
+  description: 'Single Press: Toggle Staircase lights'
+  use_blueprint:
+    path: garykrige/zha-sonoff-zigbee-switch.yaml
+    input:
+      sonoff_button: 2a065f489671139d8ea72b65cd0bc242
+      toggle_action:
+      - service: switch.toggle
+        data: {}
+        target:
+          entity_id: switch.lounge_light
+      off_action:
+      - choose:
+        - conditions:
+          - condition: device
+            type: is_on
+            device_id: 84062b0f2b61c162a78be8e518bffaad
+            entity_id: light.lounge_tv
+            domain: light
+          sequence:
+          - service: light.turn_off
+            data: {}
+            target:
+              device_id: 84062b0f2b61c162a78be8e518bffaad
+        - conditions:
+          - condition: device
+            type: is_off
+            device_id: 84062b0f2b61c162a78be8e518bffaad
+            entity_id: light.lounge_tv
+            domain: light
+          sequence:
+          - service: scene.turn_on
+            target:
+              entity_id: scene.tv_fire
+            metadata: {}
+        default: []
+- id: '1651181726747'
+  alias: 'NFC: Disarm'
+  description: ''
+  trigger:
+  - platform: event
+    event_type: tag_scanned
+    event_data:
+      device_id: be55d4ea58d27cab
+      tag_id: a5151b2c-e538-4fb5-abf8-8c08ab92dca2
+  condition: []
+  action:
+  - service: alarm_control_panel.alarm_disarm
+    data: {}
+    target:
+      entity_id: alarm_control_panel.indoor
+  mode: single
+- id: '1656263673566'
+  alias: 'Load Shedding: Backup Lighting'
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.time_till_loadshedding
+    below: 1
+  condition:
+  - condition: sun
+    after: sunset
+    after_offset: '-1:00:00'
+  - condition: state
+    entity_id: group.home_occupancy
+    state: 'on'
+  - condition: state
+    entity_id: binary_sensor.loadshedding_status
+    state: 'on'
+  action:
+  - service: switch.toggle
+    data: {}
+    target:
+      entity_id:
+      - switch.dining_room_led
+      - switch.lounge_led
+  mode: single
+- id: '1656362327431'
+  alias: 'Master Bedroom: Side Light Off'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.desk_light
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  condition:
+  - condition: time
+    after: '22:30:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+    before: 07:00:00
+  action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.desk_light
+  mode: single
+- id: '1657293008424'
+  alias: 'Lights: Turn All Off'
+  description: Turns off all lights when we leave home
+  trigger:
+  - platform: state
+    entity_id:
+    - group.home_occupancy
+    from: 'on'
+    to: 'off'
+  condition: []
+  action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id:
+      - switch.all_lights
+      area_id:
+      - backyard
+      - dining_room
+      - kitchen
+      - lounge
+      - master_bedroom
+  mode: single
+- id: '1657789040579'
+  alias: 'Lights: Link Ensuite and Shower Light'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.master_bedroom_ensuite
+    to: 'on'
+    id: Ensuite Light ON
+    from: 'off'
+  - platform: state
+    entity_id:
+    - switch.master_bedroom_ensuite
+    from: 'on'
+    to: 'off'
+    id: Ensuite Light OFF
+  condition:
+  - condition: time
+    after: '16:30:00'
+    before: '20:00:00'
+    weekday:
+    - sun
+    - sat
+    - fri
+    - thu
+    - wed
+    - tue
+    - mon
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: Ensuite Light ON
+      sequence:
+      - service: switch.turn_on
+        data: {}
+        target:
+          entity_id: switch.shower_light
+    - conditions:
+      - condition: trigger
+        id: Ensuite Light OFF
+      sequence:
+      - service: switch.turn_off
+        data: {}
+        target:
+          entity_id: switch.shower_light
+    default: []
+  mode: single
+- id: '1657790005167'
+  alias: 'Lights: Garage and Front Yard'
+  description: 'Turns on Garage and Front Yard Lights when we come home and it is
+    after dark
+
+    Turns off Garage and Front Yard Lights:
+
+    - after 5 min if the Front Door is closed
+
+    - if Front Door not closed, will wait till closed to turn off Lights'
+  trigger:
+  - platform: state
+    entity_id:
+    - group.home_occupancy
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id:
+    - person.nadir
+    to: home
+  - platform: state
+    entity_id:
+    - person.laurika
+    to: home
+  condition:
+  - condition: sun
+    after: sunset
+  action:
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id:
+      - switch.garage_light
+      - switch.front_yard_light
+  - delay:
+      hours: 0
+      minutes: 5
+      seconds: 0
+      milliseconds: 0
+  - if:
+    - condition: state
+      entity_id: binary_sensor.front_door
+      state: 'on'
+    then:
+    - service: switch.turn_off
+      data: {}
+      target:
+        entity_id:
+        - switch.garage_light
+        - switch.front_yard_light
+    else:
+    - wait_for_trigger:
+      - platform: state
+        entity_id:
+        - binary_sensor.front_door
+        from: 'on'
+        to: 'off'
+      continue_on_timeout: false
+    - service: switch.turn_off
+      data: {}
+      target:
+        entity_id:
+        - switch.garage_light
+        - switch.front_yard_light
+  mode: single
+- id: '1657898352576'
+  alias: 'Wireless Button: Master Bedroom Door'
+  description: ''
+  use_blueprint:
+    path: garykrige/zha-sonoff-zigbee-switch.yaml
+    input:
+      sonoff_button: c060647d1b8e53aaa23c7ad7df392ea1
+      toggle_action:
+      - if:
+        - condition: state
+          entity_id: switch.kitchen_and_dining_lights
+          state: 'on'
+        then:
+        - service: switch.turn_off
+          data: {}
+          target:
+            entity_id:
+            - switch.kitchen_light
+            - switch.dining_room_light
+        else:
+        - if:
+          - condition: state
+            entity_id: switch.kitchen_or_dining_lights
+            state: 'off'
+          then:
+          - service: switch.turn_off
+            data: {}
+            target:
+              entity_id:
+              - switch.kitchen_light
+              - switch.dining_room_light
+        - if:
+          - condition: state
+            entity_id: switch.kitchen_and_dining_lights
+            state: 'off'
+          then:
+          - service: switch.turn_on
+            data: {}
+            target:
+              entity_id:
+              - switch.kitchen_light
+              - switch.dining_room_light
+      off_action:
+      - service: switch.turn_off
+        data: {}
+        target:
+          area_id:
+          - upstairs_landing
+          - lounge
+          - upstairs_landing
+          - dining_room
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id:
+          - light.staircase_light
+      on_action:
+      - service: switch.toggle
+        data: {}
+        target:
+          entity_id:
+          - switch.master_bedroom_light
+          - switch.desk_light
+- id: '1657910667554'
+  alias: 'Lights: Garage Light'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.front_door
+    id: front door open
+    to: 'on'
+  - platform: state
+    entity_id:
+    - binary_sensor.front_door
+    id: front door closed
+    to: 'off'
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: front door open
+      sequence:
+      - service: switch.turn_on
+        data: {}
+        target:
+          entity_id: switch.garage_light
+    - conditions:
+      - condition: trigger
+        id: front door closed
+      sequence:
+      - service: switch.turn_off
+        data: {}
+        target:
+          entity_id: switch.garage_light
+    default: []
+  mode: single
+- id: '1658954097158'
+  alias: 'Master Bedroom: Motion Sensor'
+  description: ''
+  trigger:
+  - type: motion
+    platform: device
+    device_id: 363b65973ed11c2cfbe4f25344a98031
+    entity_id: binary_sensor.master_bedroom_motion_sensor_ias_zone
+    domain: binary_sensor
+  condition:
+  - condition: time
+    after: '23:00:00'
+    before: 06:00:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+  - condition: state
+    entity_id: group.home_occupancy
+    state: 'on'
+  action:
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id:
+      - switch.desk_light
+      - switch.master_bedroom_ensuite
+  - delay:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - wait_for_trigger:
+    - type: motion
+      platform: device
+      device_id: 363b65973ed11c2cfbe4f25344a98031
+      entity_id: binary_sensor.master_bedroom_motion_sensor_ias_zone
+      domain: binary_sensor
+    continue_on_timeout: false
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 20
+      milliseconds: 0
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id:
+      - switch.desk_light
+      - switch.master_bedroom_ensuite
+  mode: single
+- id: '1658959795312'
+  alias: 'Light: Ensuite Notification'
+  description: ''
+  trigger:
+  - platform: time
+    at: 07:15:00
+  condition:
+  - condition: state
+    entity_id: group.home_occupancy
+    state: 'on'
+  action:
+  - service: script.flash_ensuite_lights
+    data: {}
+  mode: single
+- id: '1664360796609'
+  alias: 'Load Shedding: Announce '
+  description: Announces the start of load shedding 30/15/5 min before load shedding
+    starts
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.time_till_loadshedding
+    below: 30
+    id: 30min
+  - platform: numeric_state
+    entity_id: sensor.time_till_loadshedding
+    below: 5
+    id: 5min
+  - platform: numeric_state
+    entity_id: sensor.time_till_loadshedding
+    below: 15
+    id: 15min
+  condition:
+  - condition: state
+    entity_id: binary_sensor.loadshedding_status
+    state: 'on'
+  - condition: state
+    entity_id: group.home_occupancy
+    state: 'on'
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: 30min
+      sequence:
+      - service: media_player.turn_on
+        data: {}
+        target:
+          entity_id: media_player.downstairs
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.4
+        target:
+          entity_id: media_player.downstairs
+      - service: media_player.play_media
+        target:
+          entity_id: media_player.downstairs
+        data:
+          media_content_id: media-source://tts/google_translate?message=30+minutes+to+load+shedding
+          media_content_type: provider
+        metadata:
+          title: 30 minutes to load shedding
+          thumbnail: https://brands.home-assistant.io/_/google_translate/logo.png
+          media_class: app
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: app
+            media_content_id: media-source://tts
+          - media_content_type: provider
+            media_content_id: media-source://tts/google_translate?message=30+minutes+to+load+shedding
+    - conditions:
+      - condition: trigger
+        id: 15min
+      sequence:
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.4
+        target:
+          entity_id: media_player.downstairs
+      - service: media_player.play_media
+        target:
+          entity_id: media_player.downstairs
+        data:
+          media_content_id: media-source://tts/google_translate?message=15+minutes+to+load+shedding
+          media_content_type: provider
+        metadata:
+          title: 15 minutes to load shedding
+          thumbnail: https://brands.home-assistant.io/_/google_translate/logo.png
+          media_class: app
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: app
+            media_content_id: media-source://tts
+          - media_content_type: provider
+            media_content_id: media-source://tts/google_translate?message=15+minutes+to+load+shedding
+    - conditions:
+      - condition: trigger
+        id: 5min
+      sequence:
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.4
+        target:
+          entity_id: media_player.downstairs
+      - service: media_player.play_media
+        target:
+          entity_id: media_player.downstairs
+        data:
+          media_content_id: media-source://tts/google_translate?message=5+minutes+to+load+shedding
+          media_content_type: provider
+        metadata:
+          title: 5 minutes to load shedding
+          thumbnail: https://brands.home-assistant.io/_/google_translate/logo.png
+          media_class: app
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: app
+            media_content_id: media-source://tts
+          - media_content_type: provider
+            media_content_id: media-source://tts/google_translate?message=5+minutes+to+load+shedding
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.19
+        target:
+          entity_id: media_player.master_bedroom_speaker
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 30
+          milliseconds: 0
+      - service: media_player.turn_off
+        data: {}
+        target:
+          entity_id: media_player.downstairs
+  mode: single
+- id: '1664735937810'
+  alias: 'Load Shedding: Just before'
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.time_till_loadshedding
+    below: 2
+  condition: []
+  action:
+  - service: media_player.turn_off
+    data: {}
+    target:
+      entity_id: media_player.samsung_7_series_55
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id:
+      - switch.samsung_7_series_55
+  - condition: sun
+    before: sunrise
+    after: sunset
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id:
+      - switch.dining_room_led
+      - switch.lounge_led
+  mode: single
+- id: '1666180200307'
+  alias: 'Alarm: Reminder to Arm (Evening)'
+  description: Reminder to arm the alarm if the the alarm is not armed
+  trigger:
+  - platform: time
+    at: '23:00:00'
+  condition:
+  - condition: state
+    entity_id: group.home_occupancy
+    state: 'on'
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: alarm_control_panel.indoor
+      state: disarmed
+    - condition: state
+      entity_id: alarm_control_panel.outdoor
+      state: disarmed
+  action:
+  - service: media_player.play_media
+    target:
+      entity_id: media_player.downstairs
+    data:
+      media_content_id: media-source://tts/google_translate?message=Alarm+is+not+armed
+      media_content_type: provider
+    metadata:
+      title: Alarm is not armed
+      thumbnail: https://brands.home-assistant.io/_/google_translate/logo.png
+      media_class: app
+      children_media_class:
+      navigateIds:
+      - {}
+      - media_content_type: app
+        media_content_id: media-source://tts
+      - media_content_type: provider
+        media_content_id: media-source://tts/google_translate?message=Alarm+is+not+armed
+  mode: single
+- id: '1666180589692'
+  alias: 'Alarm: Reminder to Disarm (Morning)'
+  description: Reminder to disarm the indoor alarm before going to the lounge
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.dining_room
+    to: 'on'
+  condition:
+  - condition: time
+    after: 06:30:00
+    before: 08:00:00
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: alarm_control_panel.indoor
+      state: disarmed
+  action:
+  - service: light.turn_on
+    data:
+      rgb_color:
+      - 255
+      - 0
+      - 0
+    target:
+      entity_id: light.staircase_light
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.staircase_light
+  mode: single
+- id: '1666181043660'
+  alias: 'Alarm: Guest (Upstairs PIR Bypass)'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.guest
+    id: guest-on
+    to: 'on'
+  - platform: state
+    entity_id:
+    - switch.guest
+    id: guest-off
+    to: 'off'
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: guest-on
+      sequence:
+      - service: switch.turn_on
+        data: {}
+        target:
+          entity_id: switch.upstairs_pir
+    - conditions:
+      - condition: trigger
+        id: guest-off
+      sequence:
+      - service: switch.turn_off
+        data: {}
+        target:
+          entity_id: switch.upstairs_pir
+  mode: single
+- id: '1666187370526'
+  alias: 'Lights: Turn on Lounge and Dining Room'
+  description: Turn on Lounge and Dining Room when we arrive home
+  trigger:
+  - platform: state
+    entity_id:
+    - group.home_occupancy
+    to: 'on'
+    from: 'off'
+  condition:
+  - condition: time
+    after: '16:00:00'
+  action:
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id:
+      - switch.lounge_light
+      - switch.dining_room_light
+  mode: single
+- id: '1666352260944'
+  alias: 'Light: Ensuite '
+  description: Turns off the Ensuite Light after 30 min
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.master_bedroom_ensuite
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  condition: []
+  action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.master_bedroom_ensuite
+  mode: single

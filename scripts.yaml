@@ -1,0 +1,98 @@
+arm_away:
+  alias: Arm Away
+  sequence:
+  - service: alarm_control_panel.alarm_arm_away
+    data: {}
+    target:
+      entity_id: alarm_control_panel.indoor
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - service: alarm_control_panel.alarm_arm_away
+    data: {}
+    target:
+      entity_id: alarm_control_panel.outdoor
+  mode: single
+  icon: mdi:shield
+arm_home:
+  alias: Arm Home
+  sequence:
+  - service: alarm_control_panel.alarm_arm_home
+    data: {}
+    target:
+      entity_id: alarm_control_panel.indoor
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - service: alarm_control_panel.alarm_arm_away
+    data: {}
+    target:
+      entity_id: alarm_control_panel.outdoor
+  mode: single
+  icon: mdi:shield-home-outline
+disarm_all:
+  alias: Disarm All
+  sequence:
+  - service: alarm_control_panel.alarm_disarm
+    data: {}
+    target:
+      entity_id: alarm_control_panel.indoor
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - service: alarm_control_panel.alarm_disarm
+    data: {}
+    target:
+      entity_id: alarm_control_panel.outdoor
+  mode: single
+  icon: mdi:shield-off-outline
+flash_ensuite_lights:
+  alias: Flash Ensuite Lights
+  sequence:
+  - service: switch.toggle
+    data: {}
+    target:
+      entity_id:
+      - switch.master_bedroom_ensuite
+      - switch.shower_light
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 100
+  - service: switch.toggle
+    data: {}
+    target:
+      entity_id:
+      - switch.master_bedroom_ensuite
+      - switch.shower_light
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 100
+  - service: switch.toggle
+    data: {}
+    target:
+      entity_id:
+      - switch.master_bedroom_ensuite
+      - switch.shower_light
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 100
+  - service: switch.toggle
+    data: {}
+    target:
+      entity_id:
+      - switch.master_bedroom_ensuite
+      - switch.shower_light
+  mode: single
+  icon: mdi:alarm-light-outline

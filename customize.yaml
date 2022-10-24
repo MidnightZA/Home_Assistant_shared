@@ -1,0 +1,67 @@
+binary_sensor.front_door:
+  device_class: door
+  friendly_name: Main Entrance
+binary_sensor.lounge_door:
+  device_class: door
+  friendly_name: Lounge Door
+binary_sensor.room_door:
+  device_class: door
+  friendly_name: Master Bedroom Door
+binary_sensor.kitchen_door:
+  device_class: door
+  friendly_name: Kitchen Door
+binary_sensor.room_1_window:
+  device_class: window
+  friendly_name: Room 1 Window
+binary_sensor.room_2_window:
+  device_class: window
+  friendly_name: Room 2 Window
+binary_sensor.dining_room:
+  device_class: motion
+  friendly_name: Dining Room PIR
+binary_sensor.lounge_pir:
+  device_class: motion
+  friendly_name: Lounge PIR
+binary_sensor.upstairs_pir:
+  device_class: motion
+  friendly_name: Upstairs PIR
+binary_sensor.garage_pir:
+  device_class: motion
+  friendly_name: Garage PIR
+binary_sensor.lounge_beam:
+  device_class: motion
+  friendly_name: Lounge Door Beam
+binary_sensor.back_beam:
+  device_class: motion
+  friendly_name: Backyard Beam
+binary_sensor.panics:
+  device_class: problem
+  friendly_name: Panic Button
+switch.main_entrance:
+  assumed_state: false
+switch.lounge_door:
+  assumed_state: false
+switch.master_bedroom_door:
+  assumed_state: false
+switch.kitchen_door:
+  assumed_state: false
+switch.room_1_windows:
+  assumed_state: false
+switch.room_2_windows:
+  assumed_state: false
+switch.dining_room_pir:
+  assumed_state: false
+switch.lounge_pir:
+  assumed_state: false
+switch.upstairs_pir:
+  assumed_state: false
+switch.garage_pir:
+  assumed_state: false
+switch.lounge_beam:
+  assumed_state: false
+switch.backyard_beam:
+  assumed_state: false
+switch.guest:
+  assumed_state: false
+sensor.debian_router_b_received:
+  unit_of_measurement: B
