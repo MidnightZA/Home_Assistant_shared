@@ -1,0 +1,71 @@
+alias: "Alarm: Notification - Interior"
+description: |-
+  Sends Telegram message for Interior Alarm State:
+
+  Armed:
+
+  Disarmed:
+
+  Triggered:
+trigger:
+  - platform: state
+    entity_id: alarm_control_panel.indoor
+    id: armed
+    from: disarmed
+  - platform: state
+    entity_id: alarm_control_panel.indoor
+    to: disarmed
+    id: disarmed
+  - platform: state
+    entity_id: alarm_control_panel.indoor
+    id: triggered
+    to: triggered
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: armed
+        sequence:
+          - service: notify.nadirhass_bot
+            data:
+              message: Armed
+              title: Interior Alarm
+      - conditions:
+          - condition: trigger
+            id: disarmed
+        sequence:
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 0
+              milliseconds: 100
+          - service: notify.nadirhass_bot
+            data:
+              message: Disarmed
+              title: Interior Alarm
+      - conditions:
+          - condition: trigger
+            id: triggered
+        sequence:
+          - service: notify.nadirhass_bot
+            data:
+              message: >-
+                {% for sensor in states.binary_sensor %}{%if
+                state_attr(sensor.entity_id,'device_class') == 'motion' %}{%if
+                states(sensor.entity_id) == 'on'%}The
+                {{state_attr(sensor.entity_id,'friendly_name')}} detected
+                motion{{'
+
+                '}}{%endif%}{%elif state_attr(sensor.entity_id,'device_class')
+                == 'door' or state_attr(sensor.entity_id,'device_class') ==
+                'window'%}{%if states(sensor.entity_id) == 'on'%}The
+                {{state_attr(sensor.entity_id,'friendly_name')}} was opened{{'
+
+                '}}{%endif%}{%elif state_attr(sensor.entity_id,'friendly_name')
+                == 'Panic Button'%}{%if states(sensor.entity_id) == 'on'%}The
+                {{state_attr(sensor.entity_id,'friendly_name')}} was
+                pressed}}{%endif%}{%endif%}{%endfor%}
+              title: "***Interior Alarm Triggered***"
+    default: []
+mode: single
