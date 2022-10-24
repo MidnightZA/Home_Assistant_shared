@@ -1,0 +1,24 @@
+alias: "Light: Default State Override"
+description: Turns off lights that default to on
+trigger:
+  - platform: state
+    entity_id:
+      - switch.geyser_switch
+    from: unavailable
+    to: ""
+    enabled: false
+condition: []
+action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id:
+        - switch.lounge_led
+        - switch.dining_room_led
+        - switch.master_bedroom_led
+        - switch.kitchen_led
+  - type: turn_off
+    device_id: e9662cbf347a6fbd4ce81ef0c9de6a4b
+    entity_id: light.staircase_light
+    domain: light
+mode: single
