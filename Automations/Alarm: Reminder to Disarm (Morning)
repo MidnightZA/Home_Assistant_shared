@@ -1,0 +1,35 @@
+alias: "Alarm: Reminder to Disarm (Morning)"
+description: Reminder to disarm the indoor alarm before going to the lounge
+trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.dining_room
+    to: "on"
+condition:
+  - condition: time
+    after: "06:30:00"
+    before: "08:00:00"
+  - condition: not
+    conditions:
+      - condition: state
+        entity_id: alarm_control_panel.indoor
+        state: disarmed
+action:
+  - service: light.turn_on
+    data:
+      rgb_color:
+        - 255
+        - 0
+        - 0
+    target:
+      entity_id: light.staircase_light
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.staircase_light
+mode: single
