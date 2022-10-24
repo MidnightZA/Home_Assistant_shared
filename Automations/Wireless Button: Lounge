@@ -1,0 +1,36 @@
+alias: "Wireless Button: Lounge"
+description: "Single Press: Toggle Staircase lights"
+use_blueprint:
+  path: garykrige/zha-sonoff-zigbee-switch.yaml
+  input:
+    sonoff_button: 2a065f489671139d8ea72b65cd0bc242
+    toggle_action:
+      - service: switch.toggle
+        data: {}
+        target:
+          entity_id: switch.lounge_light
+    off_action:
+      - choose:
+          - conditions:
+              - condition: device
+                type: is_on
+                device_id: 84062b0f2b61c162a78be8e518bffaad
+                entity_id: light.lounge_tv
+                domain: light
+            sequence:
+              - service: light.turn_off
+                data: {}
+                target:
+                  device_id: 84062b0f2b61c162a78be8e518bffaad
+          - conditions:
+              - condition: device
+                type: is_off
+                device_id: 84062b0f2b61c162a78be8e518bffaad
+                entity_id: light.lounge_tv
+                domain: light
+            sequence:
+              - service: scene.turn_on
+                target:
+                  entity_id: scene.tv_fire
+                metadata: {}
+        default: []
