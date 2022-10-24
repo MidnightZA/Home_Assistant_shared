@@ -1,0 +1,35 @@
+alias: "Wireless Button: Master Bedroom"
+description: |
+  Single Press: Toggle Bedroom Light
+  Double Press: Interior Arm Stay , Exterior Arm Away
+  Long Press: NIL
+use_blueprint:
+  path: garykrige/zha-sonoff-zigbee-switch.yaml
+  input:
+    toggle_action:
+      - service: switch.toggle
+        data: {}
+        target:
+          entity_id: switch.desk_light
+    off_action:
+      - service: switch.toggle
+        data: {}
+        target:
+          entity_id:
+            - switch.master_bedroom_ensuite
+            - switch.desk_light
+    on_action:
+      - service: alarm_control_panel.alarm_arm_home
+        data: {}
+        target:
+          entity_id: alarm_control_panel.indoor
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 0
+          milliseconds: 500
+      - service: alarm_control_panel.alarm_arm_away
+        target:
+          entity_id: alarm_control_panel.outdoor
+        data: {}
+    sonoff_button: c40646fb16e6a7270c8a473f8c9a8ba9
