@@ -1,0 +1,148 @@
+alias: "Alarm: Auto Arm/Disarm"
+description: >-
+  Control for Alarm System:
+
+  Auto Arm Away:  When Home occupancy is "OFF" for 60 seconds
+
+  Auto Arm Stay: Activates beams when we are home
+
+  Auto Disarm: When Nadir comes home from work
+
+  Auto Disarm Beams: Deactivates the alarm when Dining PIR or Lounge PIR detects
+  motion before opening the Main Entrance Door.
+trigger:
+  - platform: state
+    entity_id: group.home_occupancy
+    from: "on"
+    to: "off"
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    id: occupancy_off
+  - platform: state
+    entity_id: person.nadir
+    from: home
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+    id: nadir-away
+  - platform: state
+    entity_id:
+      - group.door_zones
+    id: doors-closed-1hr
+    to: "off"
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  - platform: state
+    entity_id: person.nadir
+    to: home
+    id: nadir-home
+  - platform: state
+    entity_id: binary_sensor.front_door
+    to: "on"
+    id: front-door
+  - platform: state
+    entity_id: group.interior_passives
+    to: "off"
+    for:
+      hours: 1
+      minutes: 0
+      seconds: 0
+    id: no-motion
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: occupancy_off
+        sequence:
+          - service: script.arm_away
+            data: {}
+      - conditions:
+          - condition: trigger
+            id: nadir-away
+          - condition: state
+            entity_id: person.laurika
+            state: home
+        sequence:
+          - service: switch.toggle
+            data: {}
+            target:
+              entity_id: switch.lounge_pir
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 1
+              milliseconds: 0
+          - service: script.arm_home
+            data: {}
+      - conditions:
+          - condition: trigger
+            id: doors-closed-1hr
+          - condition: state
+            entity_id: group.home_occupancy
+            state: "on"
+          - condition: time
+            after: "17:00:00"
+            weekday:
+              - mon
+              - tue
+              - wed
+              - thu
+              - fri
+              - sat
+              - sun
+        sequence:
+          - service: alarm_control_panel.alarm_arm_away
+            data: {}
+            target:
+              entity_id: alarm_control_panel.outdoor
+      - conditions:
+          - condition: trigger
+            id: nadir-home
+          - condition: state
+            entity_id: person.laurika
+            state: home
+        sequence:
+          - service: script.disarm_all
+            data: {}
+      - conditions:
+          - condition: trigger
+            id: front-door
+          - condition: state
+            entity_id: group.home_occupancy
+            state: "on"
+        sequence:
+          - service: alarm_control_panel.alarm_disarm
+            data: {}
+            target:
+              entity_id: alarm_control_panel.outdoor
+      - conditions:
+          - condition: trigger
+            id: no-motion
+          - condition: time
+            before: "23:59:59"
+            after: "22:00:00"
+            weekday:
+              - mon
+              - tue
+              - wed
+              - thu
+              - fri
+              - sat
+              - sun
+          - condition: state
+            entity_id: group.home_occupancy
+            state: "on"
+          - condition: state
+            entity_id: alarm_control_panel.indoor
+            state: disarmed
+        sequence:
+          - service: script.arm_home
+            data: {}
+    default: []
+mode: single
