@@ -1,0 +1,33 @@
+alias: "Alarm: Guest (Upstairs PIR Bypass)"
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - switch.guest
+    id: guest-on
+    to: "on"
+  - platform: state
+    entity_id:
+      - switch.guest
+    id: guest-off
+    to: "off"
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: guest-on
+        sequence:
+          - service: switch.turn_on
+            data: {}
+            target:
+              entity_id: switch.upstairs_pir
+      - conditions:
+          - condition: trigger
+            id: guest-off
+        sequence:
+          - service: switch.turn_off
+            data: {}
+            target:
+              entity_id: switch.upstairs_pir
+mode: single
