@@ -1,0 +1,62 @@
+alias: "Wireless Button: Master Bedroom Door"
+description: ""
+use_blueprint:
+  path: garykrige/zha-sonoff-zigbee-switch.yaml
+  input:
+    sonoff_button: c060647d1b8e53aaa23c7ad7df392ea1
+    toggle_action:
+      - if:
+          - condition: state
+            entity_id: switch.kitchen_and_dining_lights
+            state: "on"
+        then:
+          - service: switch.turn_off
+            data: {}
+            target:
+              entity_id:
+                - switch.kitchen_light
+                - switch.dining_room_light
+        else:
+          - if:
+              - condition: state
+                entity_id: switch.kitchen_or_dining_lights
+                state: "off"
+            then:
+              - service: switch.turn_off
+                data: {}
+                target:
+                  entity_id:
+                    - switch.kitchen_light
+                    - switch.dining_room_light
+          - if:
+              - condition: state
+                entity_id: switch.kitchen_and_dining_lights
+                state: "off"
+            then:
+              - service: switch.turn_on
+                data: {}
+                target:
+                  entity_id:
+                    - switch.kitchen_light
+                    - switch.dining_room_light
+    off_action:
+      - service: switch.turn_off
+        data: {}
+        target:
+          area_id:
+            - upstairs_landing
+            - lounge
+            - upstairs_landing
+            - dining_room
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id:
+            - light.staircase_light
+    on_action:
+      - service: switch.toggle
+        data: {}
+        target:
+          entity_id:
+            - switch.master_bedroom_light
+            - switch.desk_light
