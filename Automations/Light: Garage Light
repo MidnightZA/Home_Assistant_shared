@@ -1,0 +1,34 @@
+alias: "Light: Garage Light"
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.front_door
+    id: front door open
+    to: "on"
+  - platform: state
+    entity_id:
+      - binary_sensor.front_door
+    id: front door closed
+    to: "off"
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: front door open
+        sequence:
+          - service: switch.turn_on
+            data: {}
+            target:
+              entity_id: switch.garage_light
+      - conditions:
+          - condition: trigger
+            id: front door closed
+        sequence:
+          - service: switch.turn_off
+            data: {}
+            target:
+              entity_id: switch.garage_light
+    default: []
+mode: single
