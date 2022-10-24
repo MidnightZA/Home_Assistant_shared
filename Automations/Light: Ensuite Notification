@@ -1,0 +1,13 @@
+alias: "Light: Ensuite Notification"
+description: ""
+trigger:
+  - platform: time
+    at: "07:15:00"
+condition:
+  - condition: state
+    entity_id: group.home_occupancy
+    state: "on"
+action:
+  - service: script.flash_ensuite_lights
+    data: {}
+mode: single
