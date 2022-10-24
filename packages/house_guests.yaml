@@ -1,0 +1,10 @@
+switch:
+  - platform: mqtt   
+    name: "Guest"
+    command_topic: "house/guest"
+    state_topic: "house/guest/set"
+    optimistic: true
+    state_on: "home"
+    state_off: "not_home"  
+    payload_on: "home"
+    payload_off: "not_home"
