@@ -1,0 +1,19 @@
+alias: "Light: Turn on Lounge and Dining Room"
+description: Turn on Lounge and Dining Room when we arrive home
+trigger:
+  - platform: state
+    entity_id:
+      - group.home_occupancy
+    to: "on"
+    from: "off"
+condition:
+  - condition: time
+    after: "16:00:00"
+action:
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id:
+        - switch.lounge_light
+        - switch.dining_room_light
+mode: single
