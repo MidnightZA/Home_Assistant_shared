@@ -1,0 +1,29 @@
+alias: "Load Shedding: Just before"
+description: |-
+  Turns off TV before Load Shedding starts.
+  If after sunset, turns on load shedding lights
+trigger:
+  - platform: numeric_state
+    entity_id: sensor.time_till_loadshedding
+    below: 2
+condition: []
+action:
+  - service: media_player.turn_off
+    data: {}
+    target:
+      entity_id: media_player.samsung_7_series_55
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id:
+        - switch.samsung_7_series_55
+  - condition: sun
+    before: sunrise
+    after: sunset
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id:
+        - switch.dining_room_led
+        - switch.lounge_led
+mode: single
