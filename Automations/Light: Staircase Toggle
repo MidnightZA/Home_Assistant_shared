@@ -1,0 +1,167 @@
+alias: "Light: Staircase Toggle On/Off"
+description: >-
+  Automation for staircase light:
+
+  1: Going Up Stairs - Turn On:  Turns on when walking up the stairs, only
+  triggers when someone is at home (Disarmed - Cyan)
+
+  2: Going Up Stairs - Turn Off: Turns off 7 seconds after reaching the top
+
+  3: Going Down Stairs - Turn On: Turns on when walking down the stairs, only
+  triggers when someone is at home
+
+  4: Going Down Stairs - Turn Off: Turns off 7 seconds after reaching the bottom
+
+  5: Turn Off: Turns off after 1 minute, this is incase either action is
+  triggered but don't walk to the other end to trigger the turn off
+
+  6: Going Up Stairs - Turn On:  Turns on when walking up the stairs, only
+  triggers when someone is at home (Armed- Red)
+trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.stairs_motion_sensor_bottom_ias_zone
+    to: "on"
+    id: lower-sensor
+  - platform: state
+    entity_id:
+      - binary_sensor.stairs_motion_sensor_top_ias_zone
+    id: upper-sensor
+    to: "on"
+  - platform: state
+    entity_id: group.staircase_motion
+    from: "on"
+    to: "off"
+    id: global-off
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: lower-sensor
+          - condition: state
+            state: "off"
+            entity_id: light.staircase_light
+          - condition: state
+            entity_id: group.home_occupancy
+            state: "on"
+          - condition: device
+            device_id: 1672dc1d3c3cf8f97fb60ea3feb2e12f
+            domain: alarm_control_panel
+            entity_id: alarm_control_panel.indoor
+            type: is_disarmed
+        sequence:
+          - service: light.turn_on
+            data:
+              color_name: cyan
+            target:
+              entity_id: light.staircase_light
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.staircase_light
+            data: {}
+      - conditions:
+          - condition: trigger
+            id: upper-sensor
+          - condition: state
+            entity_id: light.staircase_light
+            state: "on"
+        sequence:
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 7
+              milliseconds: 0
+          - service: light.turn_off
+            target:
+              entity_id:
+                - light.staircase_light
+            data: {}
+      - conditions:
+          - condition: trigger
+            id: upper-sensor
+          - condition: state
+            entity_id: light.staircase_light
+            state: "off"
+          - condition: state
+            entity_id: group.home_occupancy
+            state: "on"
+          - condition: state
+            entity_id: binary_sensor.stairs_motion_sensor_bottom_ias_zone
+            state: "off"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.staircase_light
+            data:
+              color_name: darkgreen
+          - service: light.turn_on
+            data: {}
+            target:
+              entity_id:
+                - light.staircase_light
+      - conditions:
+          - condition: trigger
+            id: lower-sensor
+          - condition: state
+            state: "on"
+            entity_id: light.staircase_light
+        sequence:
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 7
+              milliseconds: 0
+          - service: light.turn_off
+            target:
+              entity_id:
+                - light.staircase_light
+            data: {}
+      - conditions:
+          - condition: trigger
+            id: global-off
+          - condition: state
+            entity_id: light.staircase_light
+            state: "on"
+        sequence:
+          - service: light.turn_off
+            target:
+              entity_id:
+                - light.staircase_light
+            data:
+              transition: 10
+      - conditions:
+          - condition: trigger
+            id: lower-sensor
+          - condition: state
+            state: "off"
+            entity_id: light.staircase_light
+          - condition: state
+            entity_id: group.home_occupancy
+            state: "on"
+          - condition: device
+            device_id: 1672dc1d3c3cf8f97fb60ea3feb2e12f
+            domain: alarm_control_panel
+            entity_id: alarm_control_panel.indoor
+            type: is_armed_home
+        sequence:
+          - service: light.turn_on
+            data:
+              color_name: red
+            target:
+              entity_id:
+                - light.staircase_light
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 10
+              milliseconds: 0
+          - service: light.turn_off
+            data: {}
+            target:
+              entity_id:
+                - light.staircase_light
+    default: []
+mode: single
