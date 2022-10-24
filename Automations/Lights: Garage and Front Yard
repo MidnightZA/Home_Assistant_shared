@@ -1,0 +1,61 @@
+alias: "Lights: Garage and Front Yard"
+description: |-
+  Turns on Garage and Front Yard Lights when we come home and it is after dark
+  Turns off Garage and Front Yard Lights:
+  - after 5 min if the Front Door is closed
+  - if Front Door not closed, will wait till closed to turn off Lights
+trigger:
+  - platform: state
+    entity_id:
+      - group.home_occupancy
+    from: "off"
+    to: "on"
+  - platform: state
+    entity_id:
+      - person.nadir
+    to: home
+  - platform: state
+    entity_id:
+      - person.laurika
+    to: home
+condition:
+  - condition: sun
+    after: sunset
+action:
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id:
+        - switch.garage_light
+        - switch.front_yard_light
+  - delay:
+      hours: 0
+      minutes: 5
+      seconds: 0
+      milliseconds: 0
+  - if:
+      - condition: state
+        entity_id: binary_sensor.front_door
+        state: "on"
+    then:
+      - service: switch.turn_off
+        data: {}
+        target:
+          entity_id:
+            - switch.garage_light
+            - switch.front_yard_light
+    else:
+      - wait_for_trigger:
+          - platform: state
+            entity_id:
+              - binary_sensor.front_door
+            from: "on"
+            to: "off"
+        continue_on_timeout: false
+      - service: switch.turn_off
+        data: {}
+        target:
+          entity_id:
+            - switch.garage_light
+            - switch.front_yard_light
+mode: single
