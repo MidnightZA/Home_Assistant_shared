@@ -1,0 +1,127 @@
+alias: "Load Shedding: Announcement"
+description: Announces the start of load shedding 30/15/5 min before load shedding starts
+trigger:
+  - platform: numeric_state
+    entity_id: sensor.time_till_loadshedding
+    below: 30
+    id: 30min
+  - platform: numeric_state
+    entity_id: sensor.time_till_loadshedding
+    below: 5
+    id: 5min
+  - platform: numeric_state
+    entity_id: sensor.time_till_loadshedding
+    below: 15
+    id: 15min
+condition:
+  - condition: state
+    entity_id: binary_sensor.loadshedding_status
+    state: "on"
+  - condition: state
+    entity_id: group.home_occupancy
+    state: "on"
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: 30min
+        sequence:
+          - service: media_player.turn_on
+            data: {}
+            target:
+              entity_id: media_player.downstairs
+          - service: media_player.volume_set
+            data:
+              volume_level: 0.4
+            target:
+              entity_id: media_player.downstairs
+          - service: media_player.play_media
+            target:
+              entity_id: media_player.downstairs
+            data:
+              media_content_id: >-
+                media-source://tts/google_translate?message=30+minutes+to+load+shedding
+              media_content_type: provider
+            metadata:
+              title: 30 minutes to load shedding
+              thumbnail: https://brands.home-assistant.io/_/google_translate/logo.png
+              media_class: app
+              children_media_class: null
+              navigateIds:
+                - {}
+                - media_content_type: app
+                  media_content_id: media-source://tts
+                - media_content_type: provider
+                  media_content_id: >-
+                    media-source://tts/google_translate?message=30+minutes+to+load+shedding
+      - conditions:
+          - condition: trigger
+            id: 15min
+        sequence:
+          - service: media_player.volume_set
+            data:
+              volume_level: 0.4
+            target:
+              entity_id: media_player.downstairs
+          - service: media_player.play_media
+            target:
+              entity_id: media_player.downstairs
+            data:
+              media_content_id: >-
+                media-source://tts/google_translate?message=15+minutes+to+load+shedding
+              media_content_type: provider
+            metadata:
+              title: 15 minutes to load shedding
+              thumbnail: https://brands.home-assistant.io/_/google_translate/logo.png
+              media_class: app
+              children_media_class: null
+              navigateIds:
+                - {}
+                - media_content_type: app
+                  media_content_id: media-source://tts
+                - media_content_type: provider
+                  media_content_id: >-
+                    media-source://tts/google_translate?message=15+minutes+to+load+shedding
+      - conditions:
+          - condition: trigger
+            id: 5min
+        sequence:
+          - service: media_player.volume_set
+            data:
+              volume_level: 0.4
+            target:
+              entity_id: media_player.downstairs
+          - service: media_player.play_media
+            target:
+              entity_id: media_player.downstairs
+            data:
+              media_content_id: >-
+                media-source://tts/google_translate?message=5+minutes+to+load+shedding
+              media_content_type: provider
+            metadata:
+              title: 5 minutes to load shedding
+              thumbnail: https://brands.home-assistant.io/_/google_translate/logo.png
+              media_class: app
+              children_media_class: null
+              navigateIds:
+                - {}
+                - media_content_type: app
+                  media_content_id: media-source://tts
+                - media_content_type: provider
+                  media_content_id: >-
+                    media-source://tts/google_translate?message=5+minutes+to+load+shedding
+          - service: media_player.volume_set
+            data:
+              volume_level: 0.19
+            target:
+              entity_id: media_player.master_bedroom_speaker
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 30
+              milliseconds: 0
+          - service: media_player.turn_off
+            data: {}
+            target:
+              entity_id: media_player.downstairs
+mode: single
