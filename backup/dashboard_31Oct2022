@@ -1,0 +1,810 @@
+title: Home
+views:
+  - path: default_view
+    title: ''
+    panel: false
+    icon: hass:home
+    badges: []
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-alarm-control-panel-card
+            entity: alarm_control_panel.indoor
+            name: Interior
+            states:
+              - armed_home
+              - armed_away
+          - type: custom:mushroom-alarm-control-panel-card
+            entity: alarm_control_panel.outdoor
+            name: Exterior
+            states:
+              - armed_home
+              - armed_away
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: group.home_occupancy
+            icon_type: entity-picture
+            icon: mdi:account-group-outline
+            layout: horizontal
+            tap_action:
+              action: none
+            hold_action:
+              action: more-info
+            double_tap_action:
+              action: none
+          - type: custom:mushroom-entity-card
+            entity: switch.guest
+            icon: mdi:account-plus
+            icon_color: green
+            tap_action:
+              action: toggle
+            hold_action:
+              action: none
+            double_tap_action:
+              action: none
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: person.nadir
+                use_entity_picture: false
+                content_info: name
+              - type: entity
+                entity: person.nadir
+              - type: entity
+                entity: sensor.nadir_s22_battery_level
+              - type: conditional
+                conditions:
+                  - entity: binary_sensor.nadir_s22_is_charging
+                    state: 'on'
+                chip:
+                  type: entity
+                  entity: sensor.nadir_s22_battery_state
+                  icon_color: yellow
+                  use_entity_picture: false
+                  icon: mdi:battery-plus-outline
+                  content_info: none
+            alignment: center
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: person.laurika
+                use_entity_picture: false
+                content_info: name
+              - type: entity
+                entity: person.laurika
+              - type: entity
+                entity: sensor.laurika_battery_level
+              - type: conditional
+                conditions:
+                  - entity: binary_sensor.laurika_is_charging
+                    state: 'on'
+                chip:
+                  type: entity
+                  entity: sensor.laurika_battery_state
+                  icon_color: yellow
+                  use_entity_picture: false
+                  icon: mdi:battery-plus-outline
+                  content_info: none
+            alignment: center
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: switch.master_bedroom_lights
+            fill_container: false
+            secondary_info: none
+            icon_color: yellow
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+            icon: mdi:lightbulb-multiple
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: switch.master_bedroom_light
+                icon_color: yellow
+                content_info: name
+                name: Main
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.desk_light
+                icon_color: yellow
+                content_info: name
+                name: Desk
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.closet_light
+                icon_color: yellow
+                content_info: name
+                name: Closet
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.master_bedroom_ensuite
+                icon_color: yellow
+                content_info: name
+                name: Ensuite
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.shower_light
+                icon_color: yellow
+                content_info: name
+                name: Bath
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+            alignment: center
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: switch.common_areas
+            fill_container: false
+            secondary_info: none
+            icon_color: yellow
+            hold_action:
+              action: more-info
+            tap_action:
+              action: toggle
+            icon: mdi:lightbulb-multiple
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: switch.kitchen_light
+                icon_color: yellow
+                content_info: name
+                name: Kitchen
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.dining_room_light
+                icon_color: yellow
+                content_info: name
+                name: Dining Room
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.lounge_light
+                icon_color: yellow
+                content_info: name
+                name: Lounge
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: light.staircase_light
+                icon_color: yellow
+                content_info: name
+                name: Staircase
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+            alignment: center
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: switch.outside_lights
+            fill_container: false
+            secondary_info: none
+            icon_color: yellow
+            hold_action:
+              action: more-info
+            tap_action:
+              action: toggle
+            icon: mdi:lightbulb-multiple
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: switch.master_bedroom_outside
+                icon_color: yellow
+                content_info: name
+                name: Backyard
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.front_yard_light
+                icon_color: yellow
+                content_info: name
+                name: Front Yard
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.veranda_light
+                icon_color: yellow
+                content_info: name
+                name: Veranda
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.garage_light
+                icon_color: yellow
+                name: Garage
+                content_info: name
+                tap_action:
+                  action: toggle
+                hold_action:
+                  action: more-info
+            alignment: center
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: switch.load_shedding_backup_lights
+            fill_container: false
+            secondary_info: none
+            icon_color: yellow
+            hold_action:
+              action: more-info
+            tap_action:
+              action: toggle
+            icon: mdi:lightbulb-multiple
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: switch.master_bedroom_led
+                icon_color: yellow
+                content_info: name
+                name: Bedroom
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.dining_room_led
+                icon_color: yellow
+                content_info: name
+                name: Dining Room
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.kitchen_led
+                icon_color: yellow
+                content_info: name
+                name: Kitchen
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: switch.lounge_led
+                icon_color: yellow
+                name: Lounge
+                content_info: name
+                tap_action:
+                  action: toggle
+                hold_action:
+                  action: more-info
+            alignment: center
+  - icon: hass:shield-home-outline
+    title: Alarm
+    path: alarm
+    badges: []
+    cards:
+      - cards:
+          - entity: alarm_control_panel.indoor
+            type: custom:mushroom-alarm-control-panel-card
+            name: Interior Alarm Zones
+            states:
+              - armed_home
+              - armed_away
+            fill_container: false
+          - entity: alarm_control_panel.outdoor
+            type: custom:mushroom-alarm-control-panel-card
+            name: Exterior Alarm Zones
+            states:
+              - armed_home
+              - armed_away
+        type: vertical-stack
+      - type: entities
+        entities:
+          - entity: sensor.paradox_battery_voltage
+            icon: mdi:current-dc
+            secondary_info: last-updated
+      - type: entities
+        entities:
+          - entity: group.door_zones
+            secondary_info: last-changed
+          - entity: group.interior_passives
+            secondary_info: last-changed
+          - entity: group.exterior_zones
+            secondary_info: last-updated
+          - entity: group.staircase_motion
+            secondary_info: last-changed
+      - type: entities
+        entities:
+          - entity: alarm_control_panel.indoor
+          - entity: binary_sensor.front_door
+            secondary_info: last-changed
+            name: Main Entrance
+          - entity: binary_sensor.lounge_door
+            secondary_info: last-changed
+            name: Lounge Door
+          - entity: binary_sensor.room_door
+            name: Master Bedroom Door
+            secondary_info: last-changed
+          - entity: binary_sensor.kitchen_door
+            name: Kitchen Door
+            secondary_info: last-changed
+          - entity: binary_sensor.room_1_window
+            name: Room 1 Window
+            secondary_info: last-changed
+          - entity: binary_sensor.room_2_window
+            name: Room 2 Window
+            secondary_info: last-changed
+          - entity: binary_sensor.dining_room
+            name: Dining Room PIR
+            secondary_info: last-changed
+          - entity: binary_sensor.lounge_pir
+            name: Lounge PIR
+            secondary_info: last-changed
+          - entity: binary_sensor.upstairs_pir
+            name: Upstairs PIR
+            secondary_info: last-changed
+          - entity: binary_sensor.panics
+        title: Interior Alarm
+        show_header_toggle: false
+        state_color: true
+      - type: entities
+        entities:
+          - entity: alarm_control_panel.outdoor
+          - entity: binary_sensor.garage_pir
+            name: Garage PIR
+            secondary_info: last-changed
+          - entity: binary_sensor.lounge_beam
+            name: Lounge Door Beam
+            secondary_info: last-changed
+          - entity: binary_sensor.back_beam
+            name: Backyard Beam
+            secondary_info: last-changed
+        title: Exterior Alarm
+        state_color: true
+        show_header_toggle: false
+      - type: logbook
+        entities:
+          - binary_sensor.back_beam
+          - binary_sensor.dining_room
+          - binary_sensor.garage_pir
+          - binary_sensor.front_door
+          - binary_sensor.kitchen_door
+          - binary_sensor.lounge_beam
+          - binary_sensor.lounge_door
+          - binary_sensor.lounge_pir
+          - binary_sensor.room_door
+          - binary_sensor.upstairs_pir
+          - binary_sensor.panics
+        hours_to_show: 1
+      - type: vertical-stack
+        cards:
+          - type: entities
+            entities: []
+            title: Alarm Zone Bypass
+            show_header_toggle: false
+          - type: grid
+            square: false
+            columns: 3
+            cards:
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                icon: hass:door
+                entity: switch.main_entrance
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                entity: switch.lounge_door
+                icon: hass:door
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                entity: switch.master_bedroom_door
+                icon: hass:door
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                entity: switch.kitchen_door
+                icon: hass:door
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                entity: switch.room_1_windows
+                icon: hass:window-closed
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                entity: switch.room_2_windows
+                icon: hass:window-closed
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                entity: switch.dining_room_pir
+                icon: hass:walk
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                entity: switch.lounge_pir
+                icon: hass:walk
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                entity: switch.upstairs_pir
+                icon: hass:walk
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                entity: switch.garage_pir
+                icon: hass:walk
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                entity: switch.lounge_beam
+                icon: hass:walk
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                layout: vertical
+                entity: switch.backyard_beam
+                icon: hass:walk
+                icon_color: yellow
+                tap_action:
+                  action: toggle
+                secondary_info: none
+      - show_name: true
+        show_icon: true
+        type: button
+        tap_action:
+          action: toggle
+        entity: switch.pgm_01
+        show_state: false
+        icon: mdi:flash-alert
+        icon_height: 50px
+  - title: Power
+    path: power
+    icon: hass:power-plug-outline
+    badges: []
+    cards:
+      - type: custom:mushroom-template-card
+        primary: Upcoming Loadshedding
+        icon: mdi:power-plug-off-outline
+        multiline_secondary: true
+        secondary: >-
+          {%- for event in states['sensor.eskomsepush'].attributes.events -%} {{
+          as_timestamp(event['start']) | timestamp_custom('%a %d %b %Y %H:%M')
+          }}-{{ as_timestamp(event['end']) | timestamp_custom('%H:%M') }} {{-
+          '\n' -}} {%- endfor -%}
+        fill_container: false
+        icon_color: blue
+      - type: entities
+        entities:
+          - entity: binary_sensor.loadshedding_status
+            secondary_info: entity-id
+          - entity: sensor.next_loadshedding_event
+            name: Load Shedding Status
+            secondary_info: entity-id
+            icon: mdi:lightbulb-alert-outline
+          - entity: sensor.time_till_loadshedding
+            name: Next Load Shedding (min)
+            icon: mdi:av-timer
+            secondary_info: entity-id
+          - entity: sensor.eskomsepush_calls_remaining
+            icon: mdi:numeric
+            secondary_info: entity-id
+          - entity: sensor.eskomsepush
+            icon: mdi:list-status
+            secondary_info: entity-id
+        title: Load Shedding
+      - type: entities
+        entities:
+          - entity: switch.geyser_switch
+            name: Geyser Switch
+            secondary_info: last-changed
+          - entity: sensor.geyser_current
+            name: Geyser Current
+            secondary_info: last-updated
+          - entity: sensor.geyser_power
+            name: Geyser Power
+            secondary_info: last-updated
+          - entity: sensor.geyser_voltage
+            name: Geyser Voltage
+            secondary_info: last-updated
+          - entity: sensor.geyser_daily
+            name: Todays Usage
+          - entity: sensor.geyser_weekly
+            name: Weekly Usage
+            secondary_info: none
+          - entity: sensor.geyser_monthly
+            name: Monthly Usage
+          - entity: sensor.geyser_usage
+            name: Total
+        state_color: true
+        title: Geyser
+      - type: entities
+        entities:
+          - entity: sensor.paradox_battery_voltage
+            icon: mdi:flash-triangle
+          - entity: sensor.psu_battery_voltage_esp
+            name: PSU Battery Voltage (ESP)
+            icon: mdi:flash-triangle-outline
+  - title: Phones
+    path: phones
+    icon: hass:phone
+    badges: []
+    cards:
+      - type: entities
+        entities:
+          - entity: device_tracker.nadir_s22_nmap
+            name: Nadir S22
+            secondary_info: none
+            icon: mdi:wifi
+          - entity: sensor.nadir_s22_battery_level
+          - entity: sensor.nadir_s22_battery_state
+        title: Nadir S22
+        state_color: false
+      - type: entities
+        entities:
+          - entity: device_tracker.laurika_a52_nmap
+            name: Laurika A52
+            icon: hass:wifi
+          - entity: sensor.laurika_battery_level
+          - entity: sensor.laurika_battery_state
+        title: Laurika A52
+        show_header_toggle: true
+      - type: map
+        entities:
+          - entity: device_tracker.nadir_s22
+          - entity: device_tracker.laurika
+        hours_to_show: 12
+        dark_mode: true
+        aspect_ratio: 150%
+        default_zoom: 13
+  - theme: ''
+    icon: hass:router-network
+    title: System
+    path: network
+    visible:
+      - user: 849ddcc5654f4b3e9088c2da8d208384
+    badges: []
+    cards:
+      - type: entities
+        entities:
+          - entity: switch.adguard_protection
+          - entity: switch.adguard_filtering
+          - entity: switch.adguard_parental_control
+          - entity: switch.adguard_safe_browsing
+          - entity: switch.adguard_safe_search
+          - entity: sensor.adguard_parental_control_blocked
+          - entity: sensor.adguard_safe_browsing_blocked
+          - entity: sensor.adguard_safe_searches_enforced
+        title: AdGuard Home
+        state_color: false
+        show_header_toggle: false
+      - type: entities
+        entities:
+          - entity: sensor.processor_use_percent
+          - entity: sensor.processor_temperature
+          - entity: sensor.memory_use_percent
+          - entity: sensor.memory_free
+          - entity: sensor.network_in_eth0
+            name: Downloaded
+          - entity: sensor.network_out_eth0
+            name: Uploaded
+        title: System Stats
+      - type: entities
+        entities:
+          - entity: sensor.disk_use_percent
+          - entity: sensor.disk_use
+          - entity: sensor.disk_free
+        state_color: false
+        title: SSD Usage
+      - type: entities
+        entities:
+          - entity: sensor.speedtest_download
+            name: Download
+            secondary_info: last-updated
+          - entity: sensor.speedtest_upload
+            name: Upload
+            secondary_info: last-updated
+          - entity: sensor.speedtest_ping
+            name: Ping
+            secondary_info: last-updated
+        title: SpeedTest
+  - theme: Backend-selected
+    title: Media
+    path: media
+    icon: mdi:multimedia
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-media-player-card
+            entity: media_player.dining_room_speaker
+            fill_container: true
+            use_media_info: false
+            show_volume_level: true
+            volume_controls: []
+            media_controls:
+              - play_pause_stop
+            collapsible_controls: true
+            double_tap_action:
+              action: toggle
+          - type: custom:mushroom-media-player-card
+            entity: media_player.master_bedroom_speaker
+            layout: horizontal
+            fill_container: true
+            use_media_info: false
+            show_volume_level: false
+            volume_controls: []
+            media_controls:
+              - play_pause_stop
+            collapsible_controls: false
+            double_tap_action:
+              action: toggle
+          - type: custom:mushroom-media-player-card
+            entity: media_player.downstairs
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-entity-card
+                entity: media_player.samsung_7_series_55
+                icon: mdi:television
+                name: Lounge TV
+                icon_color: green
+                layout: horizontal
+              - type: custom:mushroom-light-card
+                entity: light.lounge_tv
+                layout: horizontal
+                use_light_color: true
+                show_brightness_control: false
+                show_color_control: false
+                show_color_temp_control: false
+                tap_action:
+                  action: toggle
+                hold_action:
+                  action: more-info
+          - type: vertical-stack
+            cards:
+              - type: entities
+                entities:
+                  - entity: select.lounge_tv_preset
+                  - entity: select.lounge_tv_color_palette
+                show_header_toggle: false
+                state_color: false
+      - type: entities
+        entities:
+          - entity: sensor.plex_nadir_media_server
+          - entity: sensor.nadir_media_server_library_movies
+          - entity: sensor.nadir_media_server_library_series
+          - entity: sensor.nadir_media_server_library_photos
+        title: Plex Media Server
+  - theme: Backend-selected
+    title: test
+    path: test
+    icon: mdi:ab-testing
+    badges: []
+    cards:
+      - type: custom:stack-in-card
+        mode: vertical
+        style: |
+          ha-card {
+             box-shadow: red
+          }
+        cards:
+          - type: custom:stack-in-card
+            mode: horizontal
+            cards:
+              - type: custom:mushroom-entity-card
+                entity: sensor.eskomsepush
+                name: EskomSePush
+                secondary_info: last-updated
+                icon: mdi:transmission-tower-export
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                card_mod:
+                  style: |
+                    :host {
+                      --mush-icon-size: 50px;
+                      --mush-card-primary-font-size: 15px
+                    }
+              - type: custom:mushroom-chips-card
+                style: |
+                  ha-card {
+                    --chip-box-shadow: none;
+                    --chip-background: none;
+                    --chip-spacing: none;
+                    top: 20px;
+                  }
+                chips:
+                  - type: entity
+                    entity: sensor.next_loadshedding_event
+                    icon: mdi:home-lightning-bolt-outline
+                    icon_color: '#4174A1'
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: none
+                    double_tap_action:
+                      action: none
+                  - type: entity
+                    entity: sensor.time_till_loadshedding
+                    icon: mdi:clock
+                    icon_color: red
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: none
+                    double_tap_action:
+                      action: none
+                alignment: center
+          - type: custom:mushroom-template-card
+            primary: Upcoming loadshedding slots
+            multiline_secondary: true
+            secondary: |2-
+                {%- for event in states['sensor.eskomsepush'].attributes.events -%} {{
+                as_timestamp(event['start']) | timestamp_custom('%a %Y-%m-%d %H:%M') }}-{{
+                as_timestamp(event['end']) | timestamp_custom('%H:%M') }} - {{ event['note'] }}
+                {{- '\n' -}} {%- endfor -%}
+      - type: entities
+        entities:
+          - sun.sun
